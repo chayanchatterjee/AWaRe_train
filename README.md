@@ -1,2 +1,2 @@
-# GW-XNet
-Deep learning model to extract gravitational wave signals from LIGO data.
+# AWaRe - Attention module boosted Waveform Reconstruction network for gravitational waves
+

@@ -1,2 +1,2 @@
-# AWaRe - Attention module boosted Waveform Reconstruction network for gravitational waves
+# AWaRe - Attention-boosted Waveform Reconstruction network for gravitational waves
 

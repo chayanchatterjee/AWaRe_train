@@ -55,11 +55,11 @@ class CNN_LSTM(BaseModel):
         self.batch_size = self.config.train.batch_size
         self.epochs = self.config.train.epochs
         self.det = self.config.train.detector
-        self.depth = self.config.train.depth
         self.lr = self.config.model.layers.learning_rate
         self.timesteps = self.config.model.timesteps
         self.model_save_path = self.config.model.model_save_path
         self.results_save_path = self.config.model.results_save_path
+        self.dataset_type = self.config.train.dataset_type
 
         self.cnn_filters_1 = self.config.model.layers.CNN_layer_1
         self.cnn_filters_2 = self.config.model.layers.CNN_layer_2
@@ -75,8 +75,8 @@ class CNN_LSTM(BaseModel):
 
     def load_data(self):
         """Loads and preprocesses data"""
-        self.strain_train, self.signal_train = DataLoader(self.det, 'train').load_data(self.config.data)
-        self.strain_test, self.signal_test = DataLoader(self.det, 'test').load_data(self.config.data)
+        self.strain_train, self.signal_train = DataLoader(self.det, 'train').load_data(self.config.data, self.dataset_type)
+        self.strain_test, self.signal_test = DataLoader(self.det, 'test').load_data(self.config.data, self.dataset_type)
 
         self.strain_train = self._preprocess_data(self.strain_train, self.n_samples)
         self.strain_test = self._preprocess_data(self.strain_test, self.n_samples)

@@ -48,7 +48,8 @@ CFG = {
     "model": {
         "timesteps": 10,
         "model_save_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/model/Saved_models/Trained_model.h5',
-        "results_save_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/evaluation/Saved_results_files/Loss_curve.png',
+        "loss_curve_save_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/evaluation/Saved_results_files/Loss_curve.png',
+        "results_save_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/evaluation/Saved_results_files/Test_results.hdf',
 
 # For original model        
         

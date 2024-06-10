@@ -71,6 +71,7 @@ class CNN_LSTM(BaseModel):
         self.timesteps = self.config.model.timesteps
         self.model_save_path = self.config.model.model_save_path
         self.results_save_path = self.config.model.results_save_path
+        self.loss_curve_save_path = self.config.model.loss_curve_save_path
         self.dataset_type = self.config.train.dataset_type
 
         self.cnn_filters_1 = self.config.model.layers.CNN_layer_1
@@ -320,7 +321,7 @@ class CNN_LSTM(BaseModel):
         plt.ylabel('Loss')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(self.results_save_path, dpi=200)
+        plt.savefig(self.loss_curve_save_path, dpi=200)
 
     def predict_with_uncertainty(self, x_test):
         """Predicts with uncertainty"""

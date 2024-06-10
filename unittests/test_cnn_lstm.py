@@ -2,9 +2,14 @@ import unittest
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
-from dataloader.dataloader import DataLoader
+import sys
+import os
 
-from cnn_lstm import CNN_LSTM  # Make sure to import the CNN_LSTM class correctly
+# Adjust the Python path to include the project root directory
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from dataloader.dataloader import DataLoader
+from model.cnn_lstm import CNN_LSTM  # Make sure to import the CNN_LSTM class correctly
 
 class TestCNNLSTM(unittest.TestCase):
 
@@ -38,23 +43,34 @@ class TestCNNLSTM(unittest.TestCase):
                 'results_save_path': '/tmp/results.hdf5',
             },
             'data': {
-                'path_train': '/tmp/train_data.h5',
-                'path_test': '/tmp/test_data.h5'
+                'path_train_original_1': '/tmp/train_data_1.h5',
+                'path_train_original_2': '/tmp/train_data_2.h5',
+                'path_train_NRSur': '/tmp/train_NRSur.h5',
+                'path_train_high_mass': '/tmp/train_high_mass.h5',
+                'path_train_DC': '/tmp/train_DC.h5',
+                'path_train': '/tmp/train_IMRPhenomXPHM.h5',
+                'path_test_original': '/tmp/test_data_original.h5',
+                'path_test_NRSur': '/tmp/test_NRSur.h5',
+                'path_test_high_mass': '/tmp/test_high_mass.h5',
+                'path_test_DC': '/tmp/test_DC.h5',
+                'path_test_1': '/tmp/test_IMRPhenomXPHM.h5',
             }
         }
 
         # Mock data
-        self.mock_data = np.random.rand(10, 2048)  # 10 signals, each with 1000 samples
-        self.mock_labels = np.random.rand(10, 2048)  # 10 signals, each with 1000 samples
+        self.mock_data = np.random.rand(10, 2048)  # 10 signals, each with 2048 samples
+        self.mock_labels = np.random.rand(10, 2048)  # 10 signals, each with 2048 samples
 
-        # Mock DataLoader to return the mock data
-        def mock_load_data(det, mode, config, dataset_type):
-            if mode == 'train':
-                return self.mock_data, self.mock_labels
-            elif mode == 'test':
-                return self.mock_data, self.mock_labels
+        # Patch the DataLoader's load_data method to use the mock data
+        self.original_load_data = DataLoader.load_data
+        DataLoader.load_data = self.mock_load_data
 
-        DataLoader.load_data = mock_load_data
+    def tearDown(self):
+        # Restore the original load_data method after each test
+        DataLoader.load_data = self.original_load_data
+
+    def mock_load_data(self, data_config, dataset_type):
+        return self.mock_data, self.mock_labels
 
     def test_load_data(self):
         model = CNN_LSTM(self.config)

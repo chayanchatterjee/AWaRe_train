@@ -1,0 +1,22 @@
+2024-06-10 20:48:21.100530: I tensorflow/core/platform/cpu_feature_guard.cc:151] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-06-10 20:48:23.846024: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 79087 MB memory:  -> device: 0, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:07:00.0, compute capability: 8.0
+2024-06-10 20:48:23.848467: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 79085 MB memory:  -> device: 1, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:0f:00.0, compute capability: 8.0
+2024-06-10 20:48:23.850508: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:2 with 79087 MB memory:  -> device: 2, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:47:00.0, compute capability: 8.0
+2024-06-10 20:48:23.852548: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:3 with 61119 MB memory:  -> device: 3, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:4e:00.0, compute capability: 8.0
+2024-06-10 20:48:23.854616: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:4 with 79087 MB memory:  -> device: 4, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:87:00.0, compute capability: 8.0
+2024-06-10 20:48:23.857016: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:5 with 39447 MB memory:  -> device: 5, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:90:00.0, compute capability: 8.0
+2024-06-10 20:48:23.859412: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:6 with 39303 MB memory:  -> device: 6, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:b7:00.0, compute capability: 8.0
+2024-06-10 20:48:23.861673: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1525] Created device /job:localhost/replica:0/task:0/device:GPU:7 with 39447 MB memory:  -> device: 7, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:bd:00.0, compute capability: 8.0
+x_train_noisy shape: (64500, 2058, 10, 1)
+x_test_noisy shape: (2500, 2058, 10, 1)
+x_train_pure shape: (64500, 2058, 1)
+x_test_pure shape: (2500, 2058, 1)
+Traceback (most recent call last):
+  File "main.py", line 19, in <module>
+    run()
+  File "main.py", line 11, in run
+    model.load_data()
+  File "/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/model/cnn_lstm.py", line 96, in load_data
+    self.X_train_noisy = self.X_train_noisy.with_options(options)
+AttributeError: 'numpy.ndarray' object has no attribute 'with_options'

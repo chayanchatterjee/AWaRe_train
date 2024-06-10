@@ -33,12 +33,21 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 from tensorflow.keras import backend as K
 import os
+import random
 from matplotlib import pyplot as plt
 
 plt.switch_backend('agg')
 
 tfd = tfp.distributions
-strategy = tf.distribute.MirroredStrategy()
+#strategy = tf.distribute.MirroredStrategy()
+
+device_type = 'GPU'
+n_gpus = 4
+devices = tf.config.experimental.list_physical_devices(
+          device_type)
+devices_names = [d.name.split('e:')[1] for d in devices]
+strategy = tf.distribute.MirroredStrategy(
+          devices=devices_names[:n_gpus])
 
 #################################################################################################################################
 
@@ -67,7 +76,7 @@ class CNN_LSTM(BaseModel):
         self.lstm_2 = self.config.model.layers.LSTM_layer_2
         self.kernel_size = self.config.model.layers.kernel_size
         self.pool_size = self.config.model.layers.pool_size
-        self.dropout = self.config.model.layers.dropout
+        self.dropout = self.config.model.layers.Dropout
         self.num_heads = self.config.model.layers.num_heads_MHA
         self.key_dim = self.config.model.layers.key_dim_MHA
         self.train_from_checkpoint = self.config.train.train_from_checkpoint
@@ -99,7 +108,7 @@ class CNN_LSTM(BaseModel):
                 minimum = np.abs(np.min(dataset))
                 dataset = np.where(dataset > 0, dataset / maximum, dataset / minimum)
             new_array.append(dataset)
-        return new_array
+        return np.array(new_array)
 
     def split_sequence(self, sequence_noisy, sequence_pure, n_steps):
         """Splits a univariate sequence into samples"""

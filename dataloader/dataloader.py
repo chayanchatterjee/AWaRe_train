@@ -22,21 +22,21 @@ class DataLoader:
         if(self.data == 'train'):
 
             path_dict = {
-            'Original data': (self.data_config.path_train_original_1, self.data_config.path_train_original_2),
-            'NRSurrogate injections': (self.data_config.path_train_NRSur, ),
-            'High mass': (self.data_config.path_train_high_mass, ),
-            'DeepClean': (self.data_config.path_train_DC, ),
-            'IMRPhenomXPHM injections': (self.data_config.path_train, )
+            'Original data': (data_config.path_train_original_1, data_config.path_train_original_2),
+            'NRSurrogate injections': (data_config.path_train_NRSur, ),
+            'High mass': (data_config.path_train_high_mass, ),
+            'DeepClean': (data_config.path_train_DC, ),
+            'IMRPhenomXPHM injections': (data_config.path_train, )
         }
             
         elif(self.data == 'test'):
 
             path_dict = {
-            'Original data': (self.data_config.path_test_original, ),
-            'NRSurrogate injections': (self.data_config.path_test_NRSur, ),
-            'High mass': (self.data_config.path_test_high_mass, ),
-            'DeepClean': (self.data_config.path_test_DC, ),
-            'IMRPhenomXPHM injections': (self.data_config.path_test_1, )
+            'Original data': (data_config.path_test_original, ),
+            'NRSurrogate injections': (data_config.path_test_NRSur, ),
+            'High mass': (data_config.path_test_high_mass, ),
+            'DeepClean': (data_config.path_test_DC, ),
+            'IMRPhenomXPHM injections': (data_config.path_test_1, )
         }
 
         # Check if the dataset type is valid and load data
@@ -88,6 +88,13 @@ class DataLoader:
             signal = shuffled_array_signal
 
         elif(self.data == 'test'):
+
+            # Concatenate all the data from the list
+            strain = np.concatenate(all_strain, axis=0)
+            signal = np.concatenate(all_signal, axis=0)
+            noise_strain = np.concatenate(all_noise_strain, axis=0)
+            noise_signal = np.concatenate(all_noise_signal, axis=0)
+
             # Concatenate the arrays
             concatenated_array_signal = np.concatenate((signal, noise_signal))
 

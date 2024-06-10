@@ -34,21 +34,22 @@ CFG = {
        
     },
     "train": {
-        "num_training_samples": 110000,
-        "num_test_samples": 2400,
+        "dataset_type": 'IMRPhenomXPHM injections',
         "detector": 'Livingston', # 'Hanford'/'Livingston'/'Virgo'
         "n_samples_per_signal": 2048,
         "batch_size": 512,
         "epoches": 100,
         "depth": 0,
         "train_from_checkpoint": False,
-        "checkpoint_path": '/fred/oz016/Chayan/GW-Denoiser/checkpoints/Saved_checkpoint/tmp_0xb64ed658/ckpt-1', # if train_from_checkpoint == True
+        "checkpoint_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/checkpoints/Saved_checkpoint/tmp_0xb64ed658/ckpt-1', # if train_from_checkpoint == True
         "optimizer": {
             "type": "adam"
         },
     },
     "model": {
         "timesteps": 10,
+        "model_save_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/model/Saved_models/Trained_model.h5',
+        "results_save_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/evaluation/Saved_results_files/Loss_curve.png',
 
 # For original model        
         
@@ -58,9 +59,12 @@ CFG = {
             "LSTM_layer_1": 32,
             "LSTM_layer_2": 32,
             "LSTM_layer_3": 32,
+            "Dropout": 0.22,
             "Output_layer": 1,
             "kernel_size": 3,
             "pool_size": 2,
+            "num_heads_MHA": 8,
+            "key_dim_MHA": 16,
             "learning_rate": 1e-3
         },
     }

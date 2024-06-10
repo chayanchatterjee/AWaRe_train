@@ -34,7 +34,7 @@ class TestCNNLSTM(unittest.TestCase):
                     'LSTM_layer_2': 50,
                     'kernel_size': 3,
                     'pool_size': 2,
-                    'dropout': 0.2,
+                    'Dropout': 0.2,
                     'num_heads_MHA': 4,
                     'key_dim_MHA': 16,
                 },

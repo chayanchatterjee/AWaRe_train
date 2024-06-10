@@ -25,6 +25,7 @@
 # Internal
 from .base_model import BaseModel
 from dataloader.dataloader import DataLoader
+from utils.logger import get_logger
 
 # External
 import numpy as np
@@ -48,6 +49,8 @@ devices = tf.config.experimental.list_physical_devices(
 devices_names = [d.name.split('e:')[1] for d in devices]
 strategy = tf.distribute.MirroredStrategy(
           devices=devices_names[:n_gpus])
+
+LOG = get_logger('cnn-lstm')
 
 #################################################################################################################################
 
@@ -84,12 +87,14 @@ class CNN_LSTM(BaseModel):
 
     def load_data(self):
         """Loads and preprocesses data"""
+        LOG.info(f'Loading {self.dataset_type} dataset...' )
         self.strain_train, self.signal_train = DataLoader(self.det, 'train').load_data(self.config.data, self.dataset_type)
         self.strain_test, self.signal_test = DataLoader(self.det, 'test').load_data(self.config.data, self.dataset_type)
 
         self.strain_train = self._preprocess_data(self.strain_train, self.n_samples)
         self.strain_test = self._preprocess_data(self.strain_test, self.n_samples)
 
+        LOG.info('Scaling the amplitudes of the pure signals by 100...')
         self.signal_train = self.signal_train / 100.0
         self.signal_test = self.signal_test / 100.0
 
@@ -99,7 +104,21 @@ class CNN_LSTM(BaseModel):
         self.reshape_and_print()
 
     def _preprocess_data(self, data, samples):
-        """Scales the amplitudes of the signals to lie between -1 and 1"""
+        """
+        Scales the amplitudes of the signals to lie between -1 and 1.
+
+        This method iterates through each signal in the dataset and normalizes its amplitude. 
+        Positive values are scaled by dividing by the maximum value, while negative values are 
+        scaled by dividing by the absolute minimum value.
+
+        Args:
+            data (np.ndarray): The input data containing noisy signals. Shape should be (n_samples, signal_length).
+            samples (int): The number of samples in each signal.
+
+        Returns:
+            np.ndarray: The preprocessed data with amplitudes scaled between -1 and 1.
+        """
+        LOG.info('Scaling the noisy strain data to lie between -1 and 1...')
         new_array = []
         for i in range(data.shape[0]):
             dataset = data[i]
@@ -111,7 +130,24 @@ class CNN_LSTM(BaseModel):
         return np.array(new_array)
 
     def split_sequence(self, sequence_noisy, sequence_pure, n_steps):
-        """Splits a univariate sequence into samples"""
+        """
+        Splits a univariate sequence into samples for training the model.
+
+        This method takes in a noisy sequence and its corresponding pure sequence, and splits 
+        them into smaller sequences of a fixed length (n_steps). Each smaller sequence from 
+        the noisy sequence serves as the input, while the value immediately following each 
+        smaller sequence in the pure sequence serves as the target output.
+
+        Args:
+            sequence_noisy (np.ndarray): The noisy input sequence to be split.
+            sequence_pure (np.ndarray): The pure target sequence to be split.
+            n_steps (int): The number of time steps in each smaller sequence.
+
+        Returns:
+            tuple: A tuple containing two numpy arrays:
+                X (np.ndarray): The input sequences.
+                y (np.ndarray): The target outputs corresponding to each input sequence.
+        """
         X, y = [], []
         for i in range(len(sequence_noisy)):
             end_ix = i + n_steps
@@ -123,7 +159,24 @@ class CNN_LSTM(BaseModel):
         return np.array(X), np.array(y)
 
     def reshape_sequences(self, num, data_noisy, data_pure):
-        """Reshapes data into overlapping sequences"""
+        """
+        Reshapes data into overlapping sequences for model training.
+
+        This method prepares the dataset by splitting each signal into overlapping 
+        subsequences of a fixed length (timesteps). It pads the signals at both ends 
+        with zeros to ensure the output sequences match the input length.
+
+        Args:
+            num (int): The number of signals in the dataset.
+            data_noisy (np.ndarray): The noisy input data.
+            data_pure (np.ndarray): The pure target data.
+
+        Returns:
+            tuple: A tuple containing two numpy arrays:
+                arr_noisy (np.ndarray): The reshaped noisy input sequences.
+                arr_pure (np.ndarray): The reshaped pure target sequences.
+        """
+        LOG.info('Splitting the waveforms into overlapping subsequences...')
         n_steps = self.timesteps
         arr_noisy, arr_pure = [], []
 
@@ -137,8 +190,10 @@ class CNN_LSTM(BaseModel):
 
         return np.asarray(arr_noisy), np.asarray(arr_pure)
 
+
     def reshape_and_print(self):
         """Reshapes arrays to fit into Keras model and prints their shapes"""
+        LOG.info('Reshaping the data into the correct shapes...')
         self.X_train_noisy = self.X_train_noisy[..., None]
         self.X_test_noisy = self.X_test_noisy[..., None]
         self.X_train_pure = self.X_train_pure[..., None]
@@ -211,6 +266,8 @@ class CNN_LSTM(BaseModel):
 
             self.model.summary()
 
+        LOG.info('Model was built successfully')
+
         checkpoint = tf.train.Checkpoint(optimizer=optimizer, model=self.model)
         self.train(checkpoint)
 
@@ -242,6 +299,8 @@ class CNN_LSTM(BaseModel):
             early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=40, restore_best_weights=True)
             callbacks_list = [reduce_lr, early_stopping]
 
+            LOG.info('Training started')
+
             model_history = self.model.fit(
                 self.X_train_noisy, self.X_train_pure,
                 epochs=self.epochs, batch_size=self.batch_size,
@@ -261,7 +320,7 @@ class CNN_LSTM(BaseModel):
         plt.ylabel('Loss')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(self.results_save_path, dpi=400)
+        plt.savefig(self.results_save_path, dpi=200)
 
     def predict_with_uncertainty(self, x_test):
         """Predicts with uncertainty"""
@@ -274,6 +333,7 @@ class CNN_LSTM(BaseModel):
 
     def evaluate(self):
         """Evaluates the model on test data"""
+        LOG.info(f'Generating reconstructions for test dataset')
         mean, m2sd, p2sd = [], [], []
         for i in range(self.X_test_noisy.shape[0]):
             mean_preds, lower_bound_preds, upper_bound_preds = self.predict_with_uncertainty(self.X_test_noisy[i])
@@ -291,4 +351,4 @@ class CNN_LSTM(BaseModel):
             f1.create_dataset('m2sd_signals', data=m2sd)
             f1.create_dataset('p2sd_signals', data=p2sd)
 
-        print('Results file created!')
+        LOG.info(f'Results file created!')

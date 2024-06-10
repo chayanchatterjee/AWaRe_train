@@ -38,7 +38,7 @@ CFG = {
         "detector": 'Livingston', # 'Hanford'/'Livingston'/'Virgo'
         "n_samples_per_signal": 2048,
         "batch_size": 512,
-        "epochs": 100,
+        "epochs": 2,
         "train_from_checkpoint": False,
         "checkpoint_path": '/workspace/chayan_ligo/Waveform_reconstruction/AWaRe/checkpoints/Saved_checkpoint/tmp_0xb64ed658/ckpt-1', # if train_from_checkpoint == True
         "optimizer": {

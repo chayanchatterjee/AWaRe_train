@@ -376,7 +376,7 @@ def plot_reconstructed(strain_data, mean_reconstruction, lower_90, upper_90, sig
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    plt.savefig(os.path.join(output_dir, f'Reconstruction_comparison_{index}_b={before}_a={after}_with_strain.png'), bbox_inches='tight', dpi=400)
+    plt.savefig(os.path.join(output_dir, f'Reconstruction_comparison_{index}_{detector}_det_b={before}_a={after}_with_strain.png'), bbox_inches='tight', dpi=400)
     print('Plot generated!')
 
     # Calculate and print the overlap for each detector

@@ -26,7 +26,8 @@ class DataLoader:
             'NRSurrogate injections': (data_config.path_train_NRSur, ),
             'High mass': (data_config.path_train_high_mass, ),
             'DeepClean': (data_config.path_train_DC, ),
-            'IMRPhenomXPHM injections': (data_config.path_train, )
+            'IMRPhenomXPHM injections': (data_config.path_train, ),
+            'Noise reconstruction': (data_config.path_train_noise_recons, )
         }
             
         elif(self.data == 'test'):
@@ -36,7 +37,8 @@ class DataLoader:
             'NRSurrogate injections': (data_config.path_test_NRSur, ),
             'High mass': (data_config.path_test_high_mass, ),
             'DeepClean': (data_config.path_test_DC, ),
-            'IMRPhenomXPHM injections': (data_config.path_test_1, )
+            'IMRPhenomXPHM injections': (data_config.path_test_1, ),
+            'Noise reconstruction': (data_config.path_test_noise_recons, )
         }
 
         # Check if the dataset type is valid and load data
@@ -53,11 +55,25 @@ class DataLoader:
         all_noise_signal = []
 
         for f in files:
-            strain_data = f['injection_samples'][det_dict[self.det] + '_strain'][()]
-            signal_data = f['injection_parameters'][det_dict[self.det] + '_signal_whitened'][()]
-            noise_strain_data = f['noise_samples']['l1_strain'][()]
-            noise_signal_data = f['noise_parameters']['l1_signal'][()]
+            if hasattr(f, 'injection_samples'):
+                strain_data = f['injection_samples'][det_dict[self.det] + '_strain'][()]
+                signal_data = f['injection_parameters'][det_dict[self.det] + '_signal_whitened'][()]
+                noise_strain_data = f['noise_samples']['l1_strain'][()]
+                noise_signal_data = f['noise_parameters']['l1_signal'][()]
 
+            else:
+                if(self.data == 'train'):
+                    strain_data = f['strain'][0:50000][()]
+                    signal_data = f['noise'][0:50000][()]
+                    noise_strain_data = f['noise'][50000:75000][()]
+                    noise_signal_data = f['noise'][50000:75000][()]
+                    
+                elif(self.data == 'test'):
+                    strain_data = f['strain'][0:1500][()]
+                    signal_data = f['noise'][0:1500][()]
+                    noise_strain_data = f['noise'][1500:2000][()]
+                    noise_signal_data = f['noise'][1500:2000][()]
+                    
             all_strain.append(strain_data)
             all_signal.append(signal_data)
             all_noise_strain.append(noise_strain_data)

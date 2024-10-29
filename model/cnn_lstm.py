@@ -289,7 +289,7 @@ class CNN_LSTM(BaseModel):
     def train(self, checkpoint):
         """Trains the model"""
         with strategy.scope():
-            dataset_name = "/workspace/chayan_ligo/GW-Denoiser/checkpoints/Saved_checkpoint"
+            dataset_name = "/workspace/LIGO/AWaRe_train/checkpoints/Saved_checkpoint"
             checkpoint_directory = "{}/tmp_{}".format(dataset_name, str(hex(random.getrandbits(32))))
             checkpoint_prefix = os.path.join(checkpoint_directory, "ckpt")
         
